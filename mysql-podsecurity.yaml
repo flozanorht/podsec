@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: mysql
+  template:
+    metadata:
+      labels:
+        name: mysql
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: "RuntimeDefault"
+      containers:
+      - image: registry.redhat.io/rhel8/mysql-80:1
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: r00tpa55
+        - name: MYSQL_USER
+          value: user1
+        - name: MYSQL_PASSWORD
+          value: mypa55
+        - name: MYSQL_DATABASE
+          value: items
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - mountPath: "/var/lib/mysql"
+          name: db-volume
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: 
+            - "ALL"
+      volumes:
+      - name: db-volume
+        emptyDir: {}
+      - name: db-init
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: mysql
+  name: mysql
+spec:
+  ports:
+  - port: 3306
+  selector:
+    name: mysql
