@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+GapiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
@@ -34,8 +34,6 @@ spec:
           name: db-volume
       volumes:
       - name: db-volume
-        emptyDir: {}
-      - name: db-init
         emptyDir: {}
 ---
 apiVersion: v1

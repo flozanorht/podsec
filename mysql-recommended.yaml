@@ -14,9 +14,9 @@ stringData:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: mysql
   labels:
     app: dbserver
-  name: mysql
 spec:
   accessModes:
   - ReadWriteOnce
@@ -98,9 +98,8 @@ spec:
             memory: 512Mi
       volumes:
       - name: db-volume
-        emptyDir: {}
-      - name: db-init
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: mysql
 ---
 apiVersion: v1
 kind: Service
