@@ -1,0 +1,115 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql
+  labels:
+    app: dbserver
+type: Opaque
+stringData:
+  database-name: db
+  database-password: password
+  database-root-password: redhat
+  database-user: user
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: dbserver
+  name: mysql
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: dbserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dbserver
+  template:
+    metadata:
+      labels:
+        app: dbserver
+    spec:
+      containers:
+      - image: registry.redhat.io/rhel8/mysql-80:1
+        name: mysql
+        env:
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              key: database-user
+              name: mysql
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: database-password
+              name: mysql
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: database-root-password
+              name: mysql
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              key: database-name
+              name: mysql        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - mountPath: "/var/lib/mysql"
+          name: db-volume
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -i
+            - -c
+            - MYSQL_PWD="$MYSQL_PASSWORD" mysqladmin -u $MYSQL_USER ping
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -i
+            - -c
+            - MYSQL_PWD="$MYSQL_PASSWORD" mysqladmin -u $MYSQL_USER ping
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            memory: 512Mi
+      volumes:
+      - name: db-volume
+        emptyDir: {}
+      - name: db-init
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: dbserver
+  name: mysql
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: dbserver
