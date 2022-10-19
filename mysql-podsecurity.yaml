@@ -44,8 +44,6 @@ spec:
       volumes:
       - name: db-volume
         emptyDir: {}
-      - name: db-init
-        emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
