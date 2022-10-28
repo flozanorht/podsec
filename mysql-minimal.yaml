@@ -19,13 +19,13 @@ spec:
         name: mysql
         env:
         - name: MYSQL_ROOT_PASSWORD
-          value: r00tpa55
+          value: redhat
         - name: MYSQL_USER
-          value: user1
+          value: user
         - name: MYSQL_PASSWORD
-          value: mypa55
+          value: password
         - name: MYSQL_DATABASE
-          value: items
+          value: db
         ports:
         - containerPort: 3306
           name: mysql
