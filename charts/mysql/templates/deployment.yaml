@@ -9,12 +9,13 @@ spec:
   selector:
     matchLabels:
       app: {{ .Values.serviceName }}
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
         app: {{ .Values.serviceName }}
     spec:
-      strategy.type: Recreate
       containers:
       - image: registry.redhat.io/rhel8/mysql-80:{{ .Values.imageTag }}
         name: mysql
