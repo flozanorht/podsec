@@ -10,7 +10,48 @@ $ helm install mysql
 ... hopefully an output that shows helm is happy with these charts and you are logged in on OpenShift
 ```
 
-Suppose your database pod fails to start because of an error on values, such as a too small resource limit or a non-existant image tag. You have to uninstall and reinstall the chart with new values. An upgrade of the installed release will not work because the database data directory will be corrupted and you need a clean volume.
+Suppose your database pod fails to start because of an error on values, or a non-existant image tag, you could upgrade the release with changed values and fix only the incorrect one.
+
+```
+$ helm install mysql mysql \
+  --set databaseUser=user \
+  --set databasePassword=password \
+  --set databaseName=db \
+  --set imageTag=8.0-el8
+...
+$ oc get pod 
+NAME                     READY   STATUS         RESTARTS   AGE
+mysql-5bc7d46c8c-zfd66   0/1     ErrImagePull   0          5s
+$ helm upgrade mysql mysql \
+  --set imageTag=1
+$ oc get pod 
+$ oc get pod
+NAME                    READY   STATUS    RESTARTS   AGE
+mysql-74cf5ff48-shkbp   1/1     Running   0          2m30s
+```
+
+By the way, the previous command does not work as would you expect.
+It does not changes only the incorrect value.
+All values that were omitted on the upgrade command are replaced with defaults from the chart.
+So you end up with a database using unexpected name, user, and password.
+
+```
+$ helm get values mysql
+USER-SUPPLIED VALUES:
+imageTag: 1
+$ helm get values -a mysql
+COMPUTED VALUES:
+databaseName: sampledb
+databasePassword: password
+databaseRootPassword: secret
+databaseUser: user
+imageTag: 1
+memoryLimit: 512Mi
+serviceName: mysql
+volumeCapacity: 1Gi
+```
+
+Unfortunately for some erros, such as a too small resource limit, You have to uninstall and reinstall the chart with new values. An upgrade of the installed release may not work because the database data directory could be corrupted and in this case you need a clean volume.
 
 ```
 $ helm install mysql mysql \
