@@ -1,0 +1,4 @@
+apiVersion: v2
+name: mysql
+version: 0.0.1
+home: https://github.com/flozanorht/podsec

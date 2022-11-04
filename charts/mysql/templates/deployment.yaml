@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.serviceName }}
+  labels:
+    app: {{ .Values.serviceName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.serviceName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.serviceName }}
+    spec:
+      containers:
+      - image: registry.redhat.io/rhel8/mysql-80:{{ .Values.imageTag }}
+        name: mysql
+        env:
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              key: database-user
+              name: mysql
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: database-password
+              name: mysql
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: database-root-password
+              name: mysql
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              key: database-name
+              name: mysql
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - mountPath: "/var/lib/mysql"
+          name: db-volume
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -i
+            - -c
+            - MYSQL_PWD="$MYSQL_PASSWORD" mysqladmin -u $MYSQL_USER ping
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -i
+            - -c
+            - MYSQL_PWD="$MYSQL_PASSWORD" mysqladmin -u $MYSQL_USER ping
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            memory: {{ .Values.memoryLimit }}
+      volumes:
+      - name: db-volume
+        persistentVolumeClaim:
+          claimName: {{ .Values.serviceName }}

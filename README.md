@@ -7,7 +7,8 @@ The three YAML files are examples of
 * A minmal deployment that just starts a MySQL pod sucessfully
 
 * A recommended examle that adds meets the "production" requirements of setting health probes and resource limits, besides adding a PVC and a secret.
-These examles could probably be improved with start up probes. Anything else?
+These examles could probably be improved with start up probes.
+Anything else?
 
 * A minimal deployment with adds pod security attributes to avoid warnings from OCP 4.11 and Kubernetes 1.25
 
@@ -24,3 +25,6 @@ Maybe they exist as events?
 The examples of helm chart use whatever community images are the default for their respective charts.
 I have no idea if these charts can use Red Hat images or if there are charts for Red Hat images.
 But the chart examples work as a "regular" self-service developer without special privileges and without custom SCCs.
+
+The `charts` folder contains an attempt to create charts using the Red Hat images and that are similar to the templates.
+This allows you to start with helm without using community images nor very complex values.
