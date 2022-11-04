@@ -1,3 +1,4 @@
+# How do I provide "descriptions" information about chart values?
 #oc process --parameters mysql-persistent -n openshift
 #NAME                    DESCRIPTION                                                             GENERATOR           VALUE
 #MEMORY_LIMIT            Maximum amount of memory the container can use.                                             512Mi
@@ -16,4 +17,4 @@ databasePassword: "password"
 databaseRootPassword: "secret"
 databaseName: "sampledb"
 volumeCapacity: "1Gi"
-imageTag: "8.0-el8"
+imageTag: "1"
