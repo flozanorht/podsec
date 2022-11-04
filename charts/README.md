@@ -30,4 +30,15 @@ $ helm upgrade mysql mysql \
 $ oc get pod
 NAME                     READY   STATUS             RESTARTS     AGE
 mysql-67c66f965b-ng4nj   0/1     CrashLoopBackOff   2 (3s ago)   42s
+$ helm uninstall mysql
+release "mysql" uninstalled
+$ helm install mysql mysql \
+  --set databaseUser=user \
+  --set databasePassword=password \
+  --set databaseName=db \
+  --set memoryLimit=384Mi
+...
+$ oc get pod
+NAME                     READY   STATUS    RESTARTS   AGE
+mysql-67c66f965b-mwjdz   1/1     Running   0          100s
 ```
